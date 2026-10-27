@@ -3,19 +3,6 @@
  * メインエントリーポイント & ゲームループ
  */
 
-document.addEventListener('DOMContentLoaded', () => {
-  // ピンチズームを無効化（ダブルタップズームは viewport の maximum-scale=1.0 で抑止済み）
-  document.addEventListener('touchstart', (e) => {
-    if (e.touches.length > 1) {
-      // 2本指以上のピンチ操作のみ防止
-      e.preventDefault();
-    }
-  }, { passive: false });
-  // ※ touchend での e.preventDefault() は意図的に廃止。
-  //   300ms 以内の連打で preventDefault を呼ぶと、ブラウザの
-  //   「touchend → click 変換」がキャンセルされてボタンの click
-  //   リスナーが発火せず、タップ金額が加算されないバグの原因になる。
-
   // 1. エンジンとサウンドの初期化
   const engine = new GameEngine();
   const sounds = soundSystem;
