@@ -4,22 +4,17 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // ダブルタップによるズームを無効化（iOS Safari 13+ 対策）
-  let lastTouchEnd = 0;
+  // ピンチズームを無効化（ダブルタップズームは viewport の maximum-scale=1.0 で抑止済み）
   document.addEventListener('touchstart', (e) => {
     if (e.touches.length > 1) {
-      // ピンチズームも防止
+      // 2本指以上のピンチ操作のみ防止
       e.preventDefault();
     }
   }, { passive: false });
-  document.addEventListener('touchend', (e) => {
-    const now = Date.now();
-    if (now - lastTouchEnd < 300) {
-      // 300ms以内の連続タップ = ダブルタップ → ズームをキャンセル
-      e.preventDefault();
-    }
-    lastTouchEnd = now;
-  }, { passive: false });
+  // ※ touchend での e.preventDefault() は意図的に廃止。
+  //   300ms 以内の連打で preventDefault を呼ぶと、ブラウザの
+  //   「touchend → click 変換」がキャンセルされてボタンの click
+  //   リスナーが発火せず、タップ金額が加算されないバグの原因になる。
 
   // 1. エンジンとサウンドの初期化
   const engine = new GameEngine();
