@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ペイクル (PayKuru) - 電子マネー資産成長クリッカーゲーム</title>
+  <meta name="description" content="スマートフォンの電子マネー決済アプリをモチーフにした資産成長型クリッカーゲーム。タップや自動生産でペイを稼ぎ、フィンテック投資で天文学的な資産を築き上げよう！">
+  
+  <!-- Google Fonts: Outfit & Noto Sans JP -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&family=Outfit:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Style CSS -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- スマホ風ビューポートコンテナ -->
+  <main class="phone-viewport" id="appViewport">
+
+    <!-- トースト通知コンテナ -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- 上部ヘッダー -->
+    <header class="app-header">
+      <div class="brand-logo">
+        <div class="brand-icon">P</div>
+        <span>PayKuru</span>
+      </div>
+      <div class="header-actions">
+        <!-- 効果音ON/OFFボタン -->
+        <button class="header-btn" id="soundToggleBtn" title="サウンド切り替え" aria-label="効果音切り替え">
+          <i class="fa-solid fa-volume-high" id="soundIcon"></i>
+        </button>
+        <!-- 通知ベル（履歴へ移動） -->
+        <button class="header-btn" id="notifyBtn" title="アクティビティ履歴" aria-label="通知履歴">
+          <i class="fa-regular fa-bell"></i>
+          <span class="badge-dot"></span>
+        </button>
+      </div>
+    </header>
+
+    <!-- メインスクロールエリア -->
+    <div class="app-body" id="appBody">
+
+      <!-- ==============================================
+           共通: 残高カード
+           ============================================== -->
+      <section class="balance-card" aria-label="残高カード">
+        <div class="balance-card-header">
+          <span class="balance-title">
+            <i class="fa-solid fa-wallet"></i> 電子マネー残高
+          </span>
+          <button class="qr-trigger-btn" id="qrTriggerBtn">
+            <i class="fa-solid fa-qrcode"></i> 決済コード
+          </button>
+        </div>
+
+        <div class="balance-amount-wrapper">
+          <h1 class="balance-amount" id="balanceDisplay">0円</h1>
+        </div>
+
+        <div class="balance-card-footer">
+          <div class="rate-badge" id="rateDisplay">
+            毎秒 +0円
+          </div>
+          <div class="total-earned" id="totalEarnedDisplay">
+            累計獲得額：0円
+          </div>
+        </div>
+      </section>
+
+      <!-- ==============================================
+           タブ1: ホーム
+           ============================================== -->
+      <section class="tab-panel active" id="tab-home">
+        <!-- バーコード・QRコードギミック -->
+        <div class="code-display-card" id="barcodeArea">
+          <div class="code-header">
+            <span><i class="fa-solid fa-barcode"></i> お支払いバーコード</span>
+            <span style="color: var(--primary); font-weight: 700;">自動更新</span>
+          </div>
+          <div class="barcode-mock"></div>
+          <div class="barcode-number">4901 2345 6789 0123</div>
+        </div>
+
+        <!-- クイックタップアクション -->
+        <div style="background: var(--bg-card); border-radius: var(--radius-md); padding: 16px; margin-bottom: 16px; box-shadow: var(--shadow-sm); text-align: center;">
+          <h2 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 10px; color: var(--text-secondary);">
+            クイックチャージ
+          </h2>
+          <button id="quickTapBtn" class="claim-btn" style="padding: 12px; font-size: 0.95rem;">
+            <i class="fa-solid fa-bolt"></i> タップして今すぐチャージ
+          </button>
+        </div>
+
+        <!-- おすすめ強化ピックアップ -->
+        <div class="setting-section">
+          <h2 class="setting-section-title">おすすめの投資</h2>
+          <p style="font-size: 0.78rem; color: var(--text-secondary); margin-bottom: 10px;">
+            生産設備を購入すると、放置中も毎秒自動で電子マネーが増加します。
+          </p>
+          <button class="btn-secondary" style="width: 100%; justify-content: center; background: var(--primary-gradient); color: #fff; border: none; font-weight: 700; padding: 12px;" onclick="document.querySelector('[data-tab=upgrade]').click()">
+            <i class="fa-solid fa-chart-line"></i> 強化・投資画面を開く
+          </button>
+        </div>
+      </section>
+
+      <!-- ==============================================
+           タブ2: 稼ぐ（メインタップ画面）
+           ============================================== -->
+      <section class="tab-panel" id="tab-earn">
+        <div class="earn-container">
+          <!-- コンボバナー -->
+          <div class="combo-banner" id="comboBanner">
+            <span id="comboText">タップして電子マネーを獲得</span>
+          </div>
+
+          <!-- タップボタン -->
+          <div class="tap-button-wrapper">
+            <button class="tap-circle-btn" id="mainTapBtn" aria-label="タップして稼ぐ">
+              <i class="fa-solid fa-hand-holding-dollar tap-btn-icon"></i>
+              <span class="tap-btn-text">タップして稼ぐ</span>
+              <span class="tap-btn-sub">チャージ</span>
+            </button>
+          </div>
+
+          <!-- タップステータス情報 -->
+          <div class="tap-info-grid">
+            <div class="info-card">
+              <div class="info-label">1タップ獲得量</div>
+              <div class="info-val" id="tapIncomeVal">1円</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">タップ強化段階</div>
+              <div class="info-val" id="tapLevelVal">Lv.0</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">獲得倍率</div>
+              <div class="info-val" id="tapMultiplierVal">×1</div>
+            </div>
+            <div class="info-card">
+              <div class="info-label">総タップ回数</div>
+              <div class="info-val" id="totalTapsVal">0 回</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==============================================
+           タブ3: 強化（投資・自動設備・オフライン）
+           ============================================== -->
+      <section class="tab-panel" id="tab-upgrade">
+        <!-- サブタブナビ -->
+        <div class="subtabs">
+          <button class="subtab-btn active" data-category="facilities">生産設備</button>
+          <button class="subtab-btn" data-category="tap">タップ強化</button>
+          <button class="subtab-btn" data-category="offline">オフライン</button>
+          <button class="subtab-btn" data-category="campaigns">特別倍率</button>
+        </div>
+
+        <!-- 設備セクション -->
+        <div class="upgrade-section" data-category="facilities">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;">購入単位:</span>
+            <div style="display: flex; gap: 4px;">
+              <button class="buy-mult-btn active" id="buyMult1">×1</button>
+              <button class="buy-mult-btn" id="buyMult10">×10</button>
+              <button class="buy-mult-btn" id="buyMult100">×100</button>
+              <button class="buy-mult-btn" id="buyMultMax">MAX</button>
+            </div>
+          </div>
+          <div class="upgrade-list" id="facilityList">
+            <!-- 動的挿入 -->
+          </div>
+        </div>
+
+        <!-- タップ強化セクション -->
+        <div class="upgrade-section" data-category="tap" style="display: none;">
+          <div class="upgrade-list">
+            <div class="upgrade-card" id="tapUpgradeCard">
+              <!-- 動的挿入 -->
+            </div>
+          </div>
+        </div>
+
+        <!-- オフライン強化セクション -->
+        <div class="upgrade-section" data-category="offline" style="display: none;">
+          <div class="upgrade-list">
+            <div class="upgrade-card offline-card" id="offlineUpgradeCard">
+              <!-- 動的挿入 -->
+            </div>
+          </div>
+          <div style="background: var(--bg-card); border-radius: var(--radius-md); padding: 14px; margin-top: 14px; font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; border: 1px solid var(--border-light);">
+            <div style="font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">
+              <i class="fa-solid fa-circle-info" style="color: var(--primary);"></i> オフライン生産の仕様
+            </div>
+            ・アプリを閉じていても最大<b>12時間</b>まで自動生産を蓄積。<br>
+            ・強化レベルに応じて効率が<b>0% → 25% → 50% → 75% → 100%（MAX）</b>に上昇します。<br>
+            ・次回アプリ起動時にまとめて一括チャージできます。
+          </div>
+        </div>
+
+        <!-- キャンペーン倍率セクション -->
+        <div class="upgrade-section" data-category="campaigns" style="display: none;">
+          <div class="upgrade-list" id="campaignList">
+            <!-- 動的挿入 -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ==============================================
+           タブ4: 履歴（最新100件）
+           ============================================== -->
+      <section class="tab-panel" id="tab-history">
+        <div class="history-header-note">
+          <span><i class="fa-solid fa-clock-rotate-left"></i> 直近の決済・取引履歴</span>
+          <span style="font-size: 0.72rem;">最大100件保持</span>
+        </div>
+        <div class="history-list" id="historyList">
+          <!-- 動的挿入 -->
+        </div>
+      </section>
+
+      <!-- ==============================================
+           タブ5: マイページ＆設定＆テスト
+           ============================================== -->
+      <section class="tab-panel" id="tab-profile">
+        <!-- ユーザープロファイルカード -->
+        <div class="profile-card">
+          <div class="profile-avatar">
+            <i class="fa-solid fa-user-astronaut"></i>
+          </div>
+          <div class="profile-info">
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <h3 id="playerNameDisplay" style="margin: 0; font-size: 1.05rem;">ゲスト</h3>
+              <button class="edit-name-btn" id="editNameBtn" title="プレイヤーネームを変更" aria-label="プレイヤーネームを変更">
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+            </div>
+            <p>PayKuru プレミアムユーザー</p>
+          </div>
+        </div>
+
+        <!-- 資産統計情報 -->
+        <div class="setting-section">
+          <h2 class="setting-section-title">資産・プレイ統計</h2>
+          <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.82rem;">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-secondary);">現在残高:</span>
+              <span style="font-weight: 700;" id="statBalance">0円</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-secondary);">累計獲得ペイ:</span>
+              <span style="font-weight: 700;" id="statTotalEarned">0円</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-secondary);">総タップ回数:</span>
+              <span style="font-weight: 700;" id="statTotalTaps">0 回</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-secondary);">現在の毎秒自動生産:</span>
+              <span style="font-weight: 700;" id="statAutoRate">毎秒 +0円</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--text-secondary);">オフライン生産効率:</span>
+              <span style="font-weight: 700;" id="statOfflineEff">0% (Lv.0)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- データ管理 -->
+        <div class="setting-section">
+          <h2 class="setting-section-title">データ管理</h2>
+          <div class="setting-btn-row" style="margin-bottom: 8px;">
+            <button class="btn-secondary" id="manualSaveBtn">
+              <i class="fa-solid fa-floppy-disk"></i> 手動セーブ
+            </button>
+            <button class="btn-secondary btn-danger" id="resetDataBtn">
+              <i class="fa-solid fa-trash-can"></i> データ初期化
+            </button>
+          </div>
+          <div class="setting-btn-row">
+            <button class="btn-secondary" id="exportSaveBtn" title="セーブデータをJSONファイルとしてダウンロード保存">
+              <i class="fa-solid fa-file-arrow-down"></i> ファイル保存
+            </button>
+            <button class="btn-secondary" id="importSaveBtn" title="保存したセーブファイルからデータを復元">
+              <i class="fa-solid fa-file-arrow-up"></i> ファイル読込
+            </button>
+          </div>
+          <input type="file" id="importSaveInput" accept=".json,application/json" style="display: none;">
+        </div>
+
+        <!-- オフライン報酬シミュレーター（仕様動作確認用） -->
+        <div class="setting-section">
+          <h2 class="setting-section-title">オフライン動作確認シミュレータ</h2>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px;">
+            時間を疑似的に経過させてオフライン報酬モーダルの動作を直接検証できます。
+          </p>
+          <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;">
+            <button class="btn-secondary" id="sim1hBtn" style="font-size: 0.75rem; padding: 8px 4px;">
+              +1時間
+            </button>
+            <button class="btn-secondary" id="sim6hBtn" style="font-size: 0.75rem; padding: 8px 4px;">
+              +6時間
+            </button>
+            <button class="btn-secondary" id="sim12hBtn" style="font-size: 0.75rem; padding: 8px 4px;">
+              +12時間(上限)
+            </button>
+          </div>
+        </div>
+
+        <!-- 仕様書第8項 自動テストスイート -->
+        <div class="setting-section">
+          <h2 class="setting-section-title">仕様書第8項 自動テストスイート</h2>
+          <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 8px;">
+            命数法表記、オフライン計算精度、12h上限、時計逆行、二重受取防止の全テストを実行します。
+          </p>
+          <button class="btn-secondary" id="runTestsBtn" style="width: 100%; background: var(--success); color: #fff; border: none; font-weight: 700; padding: 10px;">
+            <i class="fa-solid fa-vial-circle-check"></i> 全テストを実行する
+          </button>
+          <div class="test-suite-box" style="margin-top: 10px;">
+            <div class="test-header">
+              <span>テスト結果ログ</span>
+            </div>
+            <div class="test-results-list" id="testResultsList">
+              <div style="color: #94a3b8; font-size: 0.72rem;">「全テストを実行する」を押して検証を開始してください</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /app-body -->
+
+    <!-- ==============================================
+         下部ボトムナビゲーションバー
+         ============================================== -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-tab="home">
+        <i class="fa-solid fa-house"></i>
+        <span>ホーム</span>
+      </button>
+      <button class="nav-item" data-tab="earn">
+        <i class="fa-solid fa-coins"></i>
+        <span>稼ぐ</span>
+      </button>
+      <button class="nav-item" data-tab="upgrade">
+        <i class="fa-solid fa-chart-line"></i>
+        <span>強化</span>
+        <span class="badge-dot upgrade-badge" id="upgradeNavBadge" style="display: none;"></span>
+      </button>
+      <button class="nav-item" data-tab="history">
+        <i class="fa-solid fa-receipt"></i>
+        <span>履歴</span>
+      </button>
+      <button class="nav-item" data-tab="profile">
+        <i class="fa-solid fa-user"></i>
+        <span>マイページ</span>
+      </button>
+    </nav>
+
+    <!-- ==============================================
+         オフライン報酬モーダル
+         ============================================== -->
+    <div class="modal-overlay" id="offlineModal">
+      <div class="offline-modal-card">
+        <div class="offline-modal-badge">
+          <i class="fa-solid fa-gift"></i>
+        </div>
+        <h2 class="offline-modal-title">おかえりなさい！</h2>
+        <p class="offline-modal-sub">不在中の自動決済収益がチャージ可能です</p>
+
+        <div class="offline-reward-box">
+          <div class="offline-reward-label">獲得電子マネー</div>
+          <div class="offline-reward-amount" id="offlineRewardText">0円</div>
+        </div>
+
+        <table class="offline-stat-table">
+          <tr>
+            <td>不在経過時間</td>
+            <td id="offlineElapsedText">0分</td>
+          </tr>
+          <tr>
+            <td>計算対象時間</td>
+            <td id="offlineEffectiveText">0分 (上限12時間)</td>
+          </tr>
+          <tr>
+            <td>オフライン生産効率</td>
+            <td id="offlineEfficiencyText">0%</td>
+          </tr>
+        </table>
+
+        <button class="claim-btn" id="claimRewardBtn">
+          <i class="fa-solid fa-circle-down"></i> 残高にチャージする
+        </button>
+      </div>
+    </div>
+
+    <!-- ==============================================
+         プレイヤーネーム変更モーダル
+         ============================================== -->
+    <div class="modal-overlay" id="nameChangeModal">
+      <div class="offline-modal-card" style="padding: 24px 20px;">
+        <div class="offline-modal-badge" style="background: var(--primary-gradient); margin: -46px auto 14px; box-shadow: 0 8px 20px rgba(255, 31, 72, 0.4);">
+          <i class="fa-solid fa-user-pen"></i>
+        </div>
+        <h2 class="offline-modal-title" style="font-size: 1.15rem;">プレイヤーネーム変更</h2>
+        <p class="offline-modal-sub" style="margin-bottom: 14px;">アプリ内で表示される名前を設定できます</p>
+
+        <div style="margin-bottom: 18px;">
+          <input type="text" id="playerNameInput" maxlength="15" placeholder="名前を入力（例: ゲスト）" 
+                 style="width: 100%; padding: 12px 14px; border: 1.5px solid var(--border-light); border-radius: var(--radius-md); font-size: 1rem; font-weight: 600; text-align: center; outline: none; background: #f8fafc; color: var(--text-primary); transition: border-color 0.2s;">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+          <button class="btn-secondary" id="cancelNameChangeBtn" style="padding: 12px; font-weight: 700;">キャンセル</button>
+          <button class="claim-btn" id="saveNameChangeBtn" style="padding: 12px; font-size: 0.95rem;">変更する</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- スクリプト読み込み順序 -->
+  <script src="js/format.js"></script>
+  <script src="save/save.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/test.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
