@@ -1,0 +1,1211 @@
+/* ========================================================
+   電子マネー型クリッカーゲーム「ペイクル (PayKuru)」
+   デザインスタイルシート
+   ======================================================== */
+
+:root {
+  --primary: #ff1f48;
+  --primary-dark: #d80027;
+  --primary-light: #ff4d6d;
+  --primary-gradient: linear-gradient(135deg, #ff1f48 0%, #d80027 100%);
+  --gold: #ffb703;
+  --gold-gradient: linear-gradient(135deg, #ffb703 0%, #fb8500 100%);
+  --success: #00c48c;
+  --info: #0088ff;
+  --bg-app: #f4f6f9;
+  --bg-card: #ffffff;
+  --text-primary: #191c21;
+  --text-secondary: #6e7987;
+  --text-muted: #9aa5b4;
+  --border-light: #eef1f5;
+  --border-active: #ff1f48;
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 8px 24px rgba(255, 31, 72, 0.12);
+  --shadow-card: 0 6px 20px rgba(0, 0, 0, 0.06);
+  --shadow-floating: 0 12px 32px rgba(255, 31, 72, 0.25);
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+  --font-main: 'Outfit', 'Noto Sans JP', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body {
+  font-family: var(--font-main);
+  background: #e9ecef;
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+}
+
+/* スマホ枠コンテナ（PCではスマホ風シミュレータ、実機ではフルスクリーン） */
+.phone-viewport {
+  width: 100%;
+  max-width: 440px;
+  height: 100vh;
+  max-height: 920px;
+  background: var(--bg-app);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  border-radius: 36px;
+  overflow: hidden;
+  border: 8px solid #202428;
+}
+
+@media (max-width: 480px) {
+  body {
+    background: var(--bg-app);
+  }
+  .phone-viewport {
+    max-width: 100%;
+    height: 100vh;
+    max-height: 100vh;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
+}
+
+/* 上部ステータスバー・ヘッダー */
+.app-header {
+  background: var(--bg-card);
+  padding: 12px 18px 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-light);
+  z-index: 20;
+}
+
+.brand-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 1.25rem;
+  color: var(--primary);
+  letter-spacing: -0.5px;
+}
+
+.brand-icon {
+  width: 32px;
+  height: 32px;
+  background: var(--primary-gradient);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 900;
+  box-shadow: 0 4px 10px rgba(255, 31, 72, 0.3);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-btn {
+  background: #f0f3f6;
+  border: none;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.header-btn:active {
+  transform: scale(0.92);
+  background: #e2e6eb;
+}
+
+.badge-dot {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 8px;
+  height: 8px;
+  background: var(--primary);
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+
+/* メインコンテンツエリア（スクロール可能） */
+.app-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 14px 16px 80px;
+  position: relative;
+  scrollbar-width: none;
+}
+
+.app-body::-webkit-scrollbar {
+  display: none;
+}
+
+/* タブコンテンツ制御 */
+.tab-panel {
+  display: none;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========================================================
+   残高カード（メインコンポーネント）
+   ======================================================== */
+.balance-card {
+  background: var(--primary-gradient);
+  border-radius: var(--radius-lg);
+  padding: 22px 20px 18px;
+  color: #ffffff;
+  position: relative;
+  box-shadow: var(--shadow-floating);
+  margin-bottom: 16px;
+  overflow: hidden;
+}
+
+.balance-card::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -30px;
+  width: 140px;
+  height: 140px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.balance-card::after {
+  content: '';
+  position: absolute;
+  bottom: -50px;
+  left: 20%;
+  width: 120px;
+  height: 120px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.balance-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
+}
+
+.balance-title {
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  font-weight: 500;
+  opacity: 0.9;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qr-trigger-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: background 0.2s;
+}
+
+.qr-trigger-btn:active {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.balance-amount-wrapper {
+  margin: 10px 0 12px;
+}
+
+.balance-amount {
+  font-size: 2.3rem;
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.5px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  word-break: break-all;
+}
+
+.balance-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+  font-size: 0.8rem;
+}
+
+.rate-badge {
+  background: rgba(0, 0, 0, 0.25);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+  }
+  50% {
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+  }
+}
+
+.total-earned {
+  opacity: 0.9;
+}
+
+/* バーコード・QRコードギミックカード */
+.code-display-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 16px;
+  text-align: center;
+  box-shadow: var(--shadow-sm);
+  border: 1px dashed #d0d7de;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.code-display-card:active {
+  transform: scale(0.98);
+}
+
+.code-header {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.barcode-mock {
+  height: 48px;
+  background: repeating-linear-gradient(
+    90deg,
+    #111,
+    #111 2px,
+    #fff 2px,
+    #fff 4px,
+    #111 4px,
+    #111 7px,
+    #fff 7px,
+    #fff 9px,
+    #111 9px,
+    #111 12px,
+    #fff 12px,
+    #fff 15px
+  );
+  margin: 0 auto 6px;
+  border-radius: 4px;
+  max-width: 280px;
+}
+
+.barcode-number {
+  font-size: 0.75rem;
+  font-family: monospace;
+  color: var(--text-secondary);
+  letter-spacing: 2px;
+}
+
+/* ========================================================
+   稼ぐ画面（タップ決済アクション）
+   ======================================================== */
+.earn-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 10px 0;
+}
+
+.combo-banner {
+  background: #fff;
+  border-radius: var(--radius-full);
+  padding: 6px 16px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s;
+}
+
+.combo-banner.fever {
+  background: var(--gold-gradient);
+  color: #fff;
+  transform: scale(1.08);
+  box-shadow: 0 6px 16px rgba(251, 133, 0, 0.4);
+  animation: feverBounce 0.6s infinite alternate;
+}
+
+@keyframes feverBounce {
+  from { transform: scale(1.05); }
+  to { transform: scale(1.12); }
+}
+
+.tap-button-wrapper {
+  position: relative;
+  margin: 20px 0;
+}
+
+.tap-circle-btn {
+  width: 210px;
+  height: 210px;
+  border-radius: 50%;
+  background: var(--primary-gradient);
+  border: 8px solid rgba(255, 31, 72, 0.15);
+  box-shadow: 0 16px 36px rgba(255, 31, 72, 0.35);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+
+.tap-circle-btn:active {
+  transform: scale(0.93);
+  box-shadow: 0 8px 20px rgba(255, 31, 72, 0.45);
+}
+
+.tap-btn-icon {
+  font-size: 3.2rem;
+  margin-bottom: 6px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+.tap-btn-text {
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+}
+
+.tap-btn-sub {
+  font-size: 0.8rem;
+  opacity: 0.9;
+  margin-top: 2px;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 2px 10px;
+  border-radius: 12px;
+}
+
+/* タップ時のリップルエフェクト */
+.ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  transform: scale(0);
+  animation: rippleAnim 0.6s linear;
+  pointer-events: none;
+}
+
+@keyframes rippleAnim {
+  to {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+/* ポップアップ金額（フライングナンバー） */
+.floating-number {
+  position: absolute;
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 1.4rem;
+  pointer-events: none;
+  animation: floatUp 0.8s ease-out forwards;
+  z-index: 100;
+  text-shadow: 0 2px 6px rgba(255, 255, 255, 0.9);
+}
+
+@keyframes floatUp {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: translateY(-28px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-60px) scale(1);
+  }
+}
+
+.tap-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.info-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  box-shadow: var(--shadow-sm);
+  text-align: left;
+}
+
+.info-label {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.info-val {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ========================================================
+   強化・投資画面
+   ======================================================== */
+.subtabs {
+  display: flex;
+  background: #e9edf2;
+  padding: 4px;
+  border-radius: var(--radius-full);
+  margin-bottom: 14px;
+}
+
+.subtab-btn {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 8px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.subtab-btn.active {
+  background: var(--bg-card);
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.buy-mult-btn {
+  border: 1px solid var(--border-light);
+  background: var(--bg-card);
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.buy-mult-btn:hover {
+  background: #f0f3f6;
+}
+
+.buy-mult-btn.active {
+  background: var(--primary-gradient);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 2px 8px rgba(255, 31, 72, 0.3);
+}
+
+.upgrade-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.upgrade-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border: 1px solid var(--border-light);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.upgrade-card:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
+}
+
+.upgrade-card.applied-card {
+  opacity: 0.65;
+  background: #fafbfc;
+  border-color: #e9ecef;
+}
+
+.upgrade-card.applied-card:hover {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.upgrade-icon-wrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  background: #fff0f3;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.upgrade-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.upgrade-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+}
+
+.upgrade-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.upgrade-level-badge {
+  background: #f0f3f6;
+  padding: 2px 6px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+}
+
+.upgrade-desc {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.upgrade-effect {
+  font-size: 0.8rem;
+  color: var(--success);
+  font-weight: 700;
+}
+
+.buy-btn {
+  background: var(--primary-gradient);
+  border: none;
+  border-radius: var(--radius-md);
+  color: #fff;
+  padding: 8px 14px;
+  min-width: 90px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 4px 12px rgba(255, 31, 72, 0.25);
+  flex-shrink: 0;
+}
+
+.buy-btn:active {
+  transform: scale(0.95);
+}
+
+.buy-btn.disabled,
+.buy-btn:disabled {
+  background: #d8dee6;
+  color: #8c97a5;
+  box-shadow: none;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.buy-btn-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  opacity: 0.9;
+}
+
+.buy-btn-price {
+  font-size: 0.85rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+/* オフライン専用カード */
+.offline-card {
+  background: linear-gradient(135deg, #ffffff 0%, #fdf7f8 100%);
+  border: 1.5px solid #ffccd5;
+}
+
+.offline-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: #eef1f5;
+  border-radius: 4px;
+  margin: 6px 0;
+  overflow: hidden;
+}
+
+.offline-progress-fill {
+  height: 100%;
+  background: var(--primary-gradient);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* ========================================================
+   履歴画面
+   ======================================================== */
+.history-header-note {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.history-item {
+  background: var(--bg-card);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  border-left: 4px solid var(--primary);
+}
+
+.history-item.type-offline {
+  border-left-color: #8338ec;
+}
+
+.history-item.type-upgrade {
+  border-left-color: #fb8500;
+}
+
+.history-item.type-tap {
+  border-left-color: var(--info);
+}
+
+.history-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.history-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.history-time {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.history-detail {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.history-amount {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.history-amount.positive {
+  color: var(--primary);
+}
+
+.history-amount.negative {
+  color: var(--text-secondary);
+}
+
+/* ========================================================
+   マイページ＆設定
+   ======================================================== */
+.profile-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.profile-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--primary-gradient);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 1.5rem;
+}
+
+.profile-info h3 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.edit-name-btn {
+  background: #f0f3f6;
+  border: none;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.edit-name-btn:hover {
+  background: #e2e6eb;
+  color: var(--primary);
+  transform: scale(1.08);
+}
+
+.edit-name-btn:active {
+  transform: scale(0.95);
+}
+
+.profile-info p {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.setting-section {
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.setting-section-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.setting-btn-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.btn-secondary {
+  background: #f0f3f6;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 10px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.btn-secondary:active {
+  background: #e2e6eb;
+}
+
+.btn-danger {
+  background: #fff0f3;
+  border: 1px solid #ffd4dc;
+  color: var(--primary);
+}
+
+.btn-danger:active {
+  background: #ffe0e6;
+}
+
+/* テストスイートパネル */
+.test-suite-box {
+  background: #1e222d;
+  color: #e2e8f0;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-top: 10px;
+  font-size: 0.78rem;
+}
+
+.test-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.test-run-btn {
+  background: var(--success);
+  border: none;
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.test-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.test-item {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-left: 3px solid #64748b;
+}
+
+.test-item.passed {
+  border-left-color: var(--success);
+}
+
+.test-item.failed {
+  border-left-color: #ef4444;
+}
+
+/* ========================================================
+   下部ボトムナビゲーションバー
+   ======================================================== */
+.bottom-nav {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 64px;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border-light);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 30;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  width: 25%;
+  height: 100%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.nav-item i {
+  font-size: 1.25rem;
+  margin-bottom: 3px;
+  transition: transform 0.2s ease;
+}
+
+.nav-item span {
+  font-size: 0.68rem;
+  font-weight: 600;
+}
+
+.nav-item.active {
+  color: var(--primary);
+}
+
+.nav-item.active i {
+  transform: translateY(-2px);
+}
+
+.nav-item .upgrade-badge {
+  position: absolute;
+  top: 10px;
+  right: calc(50% - 18px);
+  width: 8px;
+  height: 8px;
+}
+
+/* ========================================================
+   オフライン報酬モーダル
+   ======================================================== */
+.modal-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 100;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.offline-modal-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 360px;
+  padding: 26px 20px 22px;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+  transform: scale(0.9);
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+}
+
+.modal-overlay.active .offline-modal-card {
+  transform: scale(1);
+}
+
+.offline-modal-badge {
+  width: 68px;
+  height: 68px;
+  background: var(--gold-gradient);
+  border-radius: 50%;
+  margin: -50px auto 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 2rem;
+  box-shadow: 0 8px 20px rgba(251, 133, 0, 0.4);
+}
+
+.offline-modal-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+}
+
+.offline-modal-sub {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.offline-reward-box {
+  background: #fff2f4;
+  border: 1px solid #ffccd5;
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-bottom: 16px;
+}
+
+.offline-reward-label {
+  font-size: 0.75rem;
+  color: var(--primary);
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.offline-reward-amount {
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--primary);
+  line-height: 1.2;
+}
+
+.offline-stat-table {
+  width: 100%;
+  margin-bottom: 18px;
+  font-size: 0.8rem;
+  border-collapse: collapse;
+}
+
+.offline-stat-table td {
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.offline-stat-table td:first-child {
+  color: var(--text-secondary);
+  text-align: left;
+}
+
+.offline-stat-table td:last-child {
+  font-weight: 700;
+  text-align: right;
+}
+
+.claim-btn {
+  width: 100%;
+  background: var(--primary-gradient);
+  border: none;
+  border-radius: var(--radius-full);
+  color: #fff;
+  padding: 14px;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(255, 31, 72, 0.35);
+  transition: transform 0.1s ease;
+}
+
+.claim-btn:active {
+  transform: scale(0.97);
+}
+
+/* トースト通知 */
+.toast-container {
+  position: absolute;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 90;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast {
+  background: rgba(25, 28, 33, 0.9);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  font-size: 0.82rem;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: toastFade 2.5s forwards ease-in-out;
+}
+
+@keyframes toastFade {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  15% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  85% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
