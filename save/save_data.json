@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "playerName": "ゲスト",
+  "balance": 0,
+  "totalEarned": 0,
+  "tapLevel": 0,
+  "totalTaps": 0,
+  "offlineLevel": 0,
+  "facilities": {
+    "point_back": 0,
+    "qr_stand": 0,
+    "smart_terminal": 0,
+    "ec_gateway": 0,
+    "unattended_store": 0,
+    "merchant_network": 0,
+    "neobank": 0,
+    "ai_cash_flow": 0,
+    "cloud_datacenter": 0,
+    "national_clearing": 0
+  },
+  "campaigns": {
+    "camp_1": false,
+    "camp_2": false,
+    "camp_3": false
+  },
+  "specialUpgrades": {},
+  "lastSavedTime": 0,
+  "lastCalculatedTime": 0,
+  "history": []
+}
