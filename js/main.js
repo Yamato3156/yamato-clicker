@@ -4,6 +4,23 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
+  // ダブルタップによるズームを無効化（iOS Safari 13+ 対策）
+  let lastTouchEnd = 0;
+  document.addEventListener('touchstart', (e) => {
+    if (e.touches.length > 1) {
+      // ピンチズームも防止
+      e.preventDefault();
+    }
+  }, { passive: false });
+  document.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTouchEnd < 300) {
+      // 300ms以内の連続タップ = ダブルタップ → ズームをキャンセル
+      e.preventDefault();
+    }
+    lastTouchEnd = now;
+  }, { passive: false });
+
   // 1. エンジンとサウンドの初期化
   const engine = new GameEngine();
   const sounds = soundSystem;
