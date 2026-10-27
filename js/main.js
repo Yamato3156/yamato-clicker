@@ -3,6 +3,16 @@
  * メインエントリーポイント & ゲームループ
  */
 
+document.addEventListener('DOMContentLoaded', () => {
+  // 0. バージョン番号の読み込みと表示
+  fetch('ver.txt')
+    .then(res => res.text())
+    .then(ver => {
+      const el = document.getElementById('appVersionDisplay');
+      if (el) el.textContent = 'v' + ver.trim();
+    })
+    .catch(() => { /* フォールバック: HTMLの初期値 v0.1 をそのまま使用 */ });
+
   // 1. エンジンとサウンドの初期化
   const engine = new GameEngine();
   const sounds = soundSystem;
